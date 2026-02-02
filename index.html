@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理面板 | 可折叠侧边菜单</title>
+    <title>Panda 管理面板</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -14,45 +14,73 @@
         }
 
         :root {
-            --primary-color: #4361ee;
-            --secondary-color: #3f37c9;
-            --accent-color: #4cc9f0;
-            --light-color: #f8f9fa;
-            --dark-color: #212529;
-            --gray-color: #6c757d;
-            --light-gray: #e9ecef;
-            --success-color: #4CAF50;
-            --warning-color: #ff9800;
-            --danger-color: #f44336;
-            --sidebar-width: 250px;
-            --sidebar-collapsed-width: 70px;
-            --header-height: 70px;
+            --primary-color: #1677ff;
+            --secondary-color: #0958d9;
+            --accent-color: #4096ff;
+            --sidebar-bg: #001529;
+            --sidebar-hover: #1677ff;
+            --sidebar-active: #1677ff;
+            --header-bg: #ffffff;
+            --content-bg: #f5f5f5;
+            --card-bg: #ffffff;
+            --text-color: rgba(0, 0, 0, 0.88);
+            --text-secondary: rgba(0, 0, 0, 0.65);
+            --border-color: #f0f0f0;
+            --success-color: #52c41a;
+            --warning-color: #faad14;
+            --danger-color: #ff4d4f;
+            --sidebar-width: 240px;
+            --sidebar-collapsed-width: 80px;
+            --header-height: 64px;
             --border-radius: 8px;
-            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-            --transition: all 0.3s ease;
+            --box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03), 
+                          0 1px 6px -1px rgba(0, 0, 0, 0.02), 
+                          0 2px 4px 0 rgba(0, 0, 0, 0.02);
+            --transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+
+        /* 深色主题变量 */
+        :root[data-theme="dark"] {
+            --primary-color: #1677ff;
+            --secondary-color: #0958d9;
+            --accent-color: #4096ff;
+            --sidebar-bg: #0f0f0f;
+            --sidebar-hover: #262626;
+            --sidebar-active: #1677ff;
+            --header-bg: #141414;
+            --content-bg: #000000;
+            --card-bg: #141414;
+            --text-color: rgba(255, 255, 255, 0.85);
+            --text-secondary: rgba(255, 255, 255, 0.65);
+            --border-color: #303030;
+            --success-color: #49aa19;
+            --warning-color: #d89614;
+            --danger-color: #dc4446;
         }
 
         body {
-            background-color: #f5f7fb;
-            color: var(--dark-color);
+            background-color: var(--content-bg);
+            color: var(--text-color);
             display: flex;
             min-height: 100vh;
-            transition: var(--transition);
+            overflow-x: hidden;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         /* 侧边栏样式 */
         .sidebar {
             width: var(--sidebar-width);
-            background-color: white;
+            background-color: var(--sidebar-bg);
             height: 100vh;
             position: fixed;
             left: 0;
             top: 0;
-            box-shadow: var(--box-shadow);
-            z-index: 100;
+            z-index: 1000;
             transition: var(--transition);
             overflow-y: auto;
             overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         .sidebar.collapsed {
@@ -60,12 +88,11 @@
         }
 
         .sidebar-header {
-            padding: 20px;
-            border-bottom: 1px solid var(--light-gray);
+            padding: 16px 24px;
+            height: var(--header-height);
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            height: var(--header-height);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .logo {
@@ -77,21 +104,19 @@
             overflow: hidden;
         }
 
-        .sidebar.collapsed .logo {
+        .logo-icon {
+            font-size: 24px;
+            color: white;
+            min-width: 24px;
+            display: flex;
+            align-items: center;
             justify-content: center;
-            gap: 0;
-        }
-
-        .logo i {
-            font-size: 28px;
-            color: var(--primary-color);
-            min-width: 28px;
         }
 
         .logo-text {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
-            color: var(--dark-color);
+            color: white;
             transition: var(--transition);
             opacity: 1;
         }
@@ -104,57 +129,82 @@
         .toggle-btn {
             background: none;
             border: none;
-            font-size: 18px;
-            color: var(--gray-color);
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.65);
             cursor: pointer;
-            padding: 5px;
+            padding: 6px;
             border-radius: 4px;
             transition: var(--transition);
+            margin-left: auto;
         }
 
         .toggle-btn:hover {
-            background-color: var(--light-gray);
-            color: var(--primary-color);
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
         }
 
         .sidebar.collapsed .toggle-btn {
             transform: rotate(180deg);
+            margin: 0 auto;
         }
 
         .sidebar-menu {
-            padding: 20px 0;
+            padding: 16px 0;
+            flex: 1;
             transition: var(--transition);
+        }
+
+        .menu-group {
+            margin-bottom: 8px;
+        }
+
+        .menu-group-title {
+            padding: 8px 24px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.45);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: var(--transition);
+            opacity: 1;
+            white-space: nowrap;
+        }
+
+        .sidebar.collapsed .menu-group-title {
+            opacity: 0;
+            width: 0;
+            padding: 8px 0;
+            text-align: center;
         }
 
         .menu-item {
-            padding: 12px 20px;
+            padding: 12px 24px;
             display: flex;
             align-items: center;
-            gap: 15px;
-            color: var(--gray-color);
+            gap: 12px;
+            color: rgba(255, 255, 255, 0.65);
             text-decoration: none;
             transition: var(--transition);
-            border-left: 4px solid transparent;
             cursor: pointer;
             position: relative;
+            border-left: 3px solid transparent;
         }
 
         .menu-item:hover {
-            background-color: rgba(67, 97, 238, 0.05);
-            color: var(--primary-color);
+            background-color: rgba(255, 255, 255, 0.05);
+            color: white;
         }
 
         .menu-item.active {
-            background-color: rgba(67, 97, 238, 0.1);
-            color: var(--primary-color);
-            border-left-color: var(--primary-color);
+            background-color: var(--sidebar-active);
+            color: white;
+            border-left-color: white;
         }
 
         .menu-item i {
             width: 20px;
             text-align: center;
             min-width: 20px;
-            font-size: 18px;
+            font-size: 16px;
         }
 
         .menu-text {
@@ -173,9 +223,14 @@
             margin-left: auto;
             transition: var(--transition);
             font-size: 12px;
+            color: rgba(255, 255, 255, 0.45);
         }
 
         .menu-item.active .menu-arrow {
+            color: white;
+        }
+
+        .menu-item.has-submenu.active .menu-arrow {
             transform: rotate(90deg);
         }
 
@@ -188,7 +243,7 @@
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease;
-            background-color: rgba(248, 249, 250, 0.8);
+            background-color: rgba(0, 21, 41, 0.9);
         }
 
         .submenu.open {
@@ -196,33 +251,32 @@
         }
 
         .submenu-item {
-            padding: 10px 20px 10px 50px;
+            padding: 10px 24px 10px 56px;
             display: flex;
             align-items: center;
-            color: var(--gray-color);
+            color: rgba(255, 255, 255, 0.65);
             text-decoration: none;
             transition: var(--transition);
-            border-left: 4px solid transparent;
+            border-left: 3px solid transparent;
+            font-size: 14px;
         }
 
         .sidebar.collapsed .submenu-item {
-            padding-left: 20px;
+            padding-left: 24px;
             justify-content: center;
         }
 
         .submenu-item:hover, .submenu-item.active {
-            background-color: rgba(67, 97, 238, 0.05);
-            color: var(--primary-color);
+            background-color: rgba(255, 255, 255, 0.05);
+            color: white;
         }
 
         .submenu-item.active {
-            border-left-color: var(--primary-color);
+            border-left-color: white;
         }
 
         .submenu-item i {
             font-size: 14px;
-            width: 20px;
-            text-align: center;
         }
 
         .submenu-text {
@@ -240,66 +294,13 @@
             font-size: 16px;
         }
 
-        /* 二级子菜单 */
-        .subsubmenu {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-            background-color: rgba(233, 236, 239, 0.5);
-        }
-
-        .subsubmenu.open {
-            max-height: 200px;
-        }
-
-        .subsubmenu-item {
-            padding: 8px 20px 8px 70px;
-            display: flex;
-            align-items: center;
-            color: var(--gray-color);
-            text-decoration: none;
-            transition: var(--transition);
-            font-size: 14px;
-        }
-
-        .sidebar.collapsed .subsubmenu-item {
-            padding-left: 20px;
-            justify-content: center;
-        }
-
-        .subsubmenu-item:hover, .subsubmenu-item.active {
-            background-color: rgba(67, 97, 238, 0.05);
-            color: var(--primary-color);
-        }
-
-        .subsubmenu-text {
-            transition: var(--transition);
-            opacity: 1;
-            white-space: nowrap;
-        }
-
-        .sidebar.collapsed .subsubmenu-text {
-            opacity: 0;
-            width: 0;
-        }
-
-        .menu-divider {
-            height: 1px;
-            background-color: var(--light-gray);
-            margin: 15px 20px;
-        }
-
-        .sidebar.collapsed .menu-divider {
-            margin: 15px 10px;
-        }
-
         /* 工具提示 - 侧边栏折叠时显示 */
         .tooltip {
             position: absolute;
             left: 100%;
             top: 50%;
             transform: translateY(-50%);
-            background-color: var(--dark-color);
+            background-color: rgba(0, 0, 0, 0.75);
             color: white;
             padding: 8px 12px;
             border-radius: 4px;
@@ -310,7 +311,7 @@
             transition: opacity 0.2s, visibility 0.2s;
             z-index: 1000;
             pointer-events: none;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
         }
 
         .tooltip::before {
@@ -321,12 +322,11 @@
             transform: translateY(-50%);
             border-width: 6px;
             border-style: solid;
-            border-color: transparent var(--dark-color) transparent transparent;
+            border-color: transparent rgba(0, 0, 0, 0.75) transparent transparent;
         }
 
         .sidebar.collapsed .menu-item:hover .tooltip,
-        .sidebar.collapsed .submenu-item:hover .tooltip,
-        .sidebar.collapsed .subsubmenu-item:hover .tooltip {
+        .sidebar.collapsed .submenu-item:hover .tooltip {
             opacity: 1;
             visibility: visible;
         }
@@ -335,8 +335,11 @@
         .main-content {
             flex: 1;
             margin-left: var(--sidebar-width);
-            padding: 20px;
+            padding: 0;
             transition: var(--transition);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .sidebar.collapsed ~ .main-content {
@@ -346,85 +349,122 @@
         /* 顶部栏 */
         .header {
             height: var(--header-height);
-            background-color: white;
-            border-radius: var(--border-radius);
-            padding: 0 25px;
+            background-color: var(--header-bg);
+            padding: 0 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: var(--box-shadow);
-            margin-bottom: 25px;
+            box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+            z-index: 999;
+            position: sticky;
+            top: 0;
+            transition: background-color 0.3s;
         }
 
-        .header-left h1 {
-            font-size: 24px;
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .page-title {
+            font-size: 20px;
             font-weight: 600;
+            color: var(--text-color);
+            transition: color 0.3s;
         }
 
         .header-right {
             display: flex;
             align-items: center;
-            gap: 25px;
+            gap: 24px;
         }
 
-        .search-box {
-            position: relative;
+        /* 主题切换按钮 */
+        .theme-toggle {
+            margin-right: 8px;
         }
 
-        .search-box input {
-            padding: 10px 15px 10px 40px;
-            border-radius: 30px;
-            border: 1px solid var(--light-gray);
-            width: 250px;
-            transition: var(--transition);
-        }
-
-        .search-box input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            width: 300px;
-        }
-
-        .search-box i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray-color);
-        }
-
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-        }
-
-        .user-avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background-color: var(--primary-color);
+        .theme-toggle-btn {
+            padding: 6px 12px;
+            font-size: 14px;
+            background-color: var(--card-bg);
+            border-color: var(--border-color);
+            color: var(--text-color);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 18px;
+            transition: var(--transition);
         }
 
-        .user-info {
+        .theme-toggle-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .theme-text {
+            margin-left: 6px;
+            font-size: 14px;
+        }
+
+        .locale-info {
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
         }
 
-        .user-name {
-            font-weight: 600;
+        .locale-flag {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #009c3b;
+            position: relative;
+            overflow: hidden;
         }
 
-        .user-role {
-            font-size: 13px;
-            color: var(--gray-color);
+        .locale-flag::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background-color: #ffdf00;
+        }
+
+        .locale-flag::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background-color: #002776;
+        }
+
+        .time-date {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .timezone {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .date {
+            color: var(--text-color);
+            font-size: 14px;
+            font-weight: 200;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
 
         .notification {
@@ -433,8 +473,8 @@
         }
 
         .notification i {
-            font-size: 20px;
-            color: var(--gray-color);
+            font-size: 18px;
+            color: var(--text-secondary);
         }
 
         .notification-badge {
@@ -452,77 +492,182 @@
             justify-content: center;
         }
 
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .user-profile:hover {
+            background-color: var(--border-color);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* 内容区域 */
+        .content-container {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            transition: background-color 0.3s;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .content-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-color);
+            transition: color 0.3s;
+        }
+
+        .content-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            color: white;
+        }
+
         /* 卡片样式 */
         .card-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
-            margin-bottom: 30px;
+            gap: 24px;
+            margin-bottom: 24px;
         }
 
         .card {
-            background-color: white;
+            background-color: var(--card-bg);
             border-radius: var(--border-radius);
-            padding: 25px;
+            padding: 24px;
             box-shadow: var(--box-shadow);
             transition: var(--transition);
+            border: 1px solid var(--border-color);
         }
 
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 16px;
         }
 
         .card-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
+            color: var(--text-color);
+            transition: color 0.3s;
         }
 
         .card-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 22px;
+            font-size: 18px;
         }
 
-        .card-icon.users {
-            background-color: var(--primary-color);
+        .card-icon.members {
+            background-color: #722ed1;
         }
 
-        .card-icon.revenue {
-            background-color: var(--success-color);
+        .card-icon.finance {
+            background-color: #13c2c2;
         }
 
-        .card-icon.orders {
-            background-color: var(--warning-color);
+        .card-icon.reports {
+            background-color: #52c41a;
         }
 
-        .card-icon.visitors {
-            background-color: var(--accent-color);
+        .card-icon.agents {
+            background-color: #fa8c16;
         }
 
         .card-value {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 700;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            color: var(--text-color);
+            transition: color 0.3s;
         }
 
         .card-change {
             font-size: 14px;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
         }
 
         .card-change.positive {
@@ -533,32 +678,100 @@
             color: var(--danger-color);
         }
 
-        /* 内容区域 */
-        .content-section {
-            background-color: white;
+        /* 表格区域 */
+        .table-container {
+            background-color: var(--card-bg);
             border-radius: var(--border-radius);
-            padding: 25px;
+            padding: 24px;
             box-shadow: var(--box-shadow);
-            margin-bottom: 30px;
+            margin-top: 24px;
+            border: 1px solid var(--border-color);
+            transition: background-color 0.3s, border-color 0.3s;
         }
 
-        .section-title {
-            font-size: 20px;
+        .table-title {
+            font-size: 18px;
             font-weight: 600;
             margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            color: var(--text-color);
+            transition: color 0.3s;
         }
 
-        .section-title i {
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            color: var(--text-color);
+            background-color: rgba(0, 0, 0, 0.02);
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        /* 深色主题表格标题背景 */
+        :root[data-theme="dark"] table th {
+            background-color: rgba(255, 255, 255, 0.04);
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            transition: color 0.3s, border-color 0.3s;
+        }
+
+        .status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status.active {
+            background-color: rgba(82, 196, 26, 0.1);
+            color: var(--success-color);
+        }
+
+        .status.pending {
+            background-color: rgba(250, 173, 20, 0.1);
+            color: var(--warning-color);
+        }
+
+        .status.inactive {
+            background-color: rgba(0, 0, 0, 0.06);
+            color: var(--text-secondary);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background-color: transparent;
+            color: var(--text-secondary);
+            font-size: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .action-btn:hover {
+            border-color: var(--primary-color);
             color: var(--primary-color);
         }
 
-        /* 响应式设计 */
+        /* 移动端适配 */
         @media (max-width: 992px) {
             .sidebar {
                 transform: translateX(-100%);
+                width: var(--sidebar-width);
             }
             
             .sidebar.active {
@@ -571,80 +784,68 @@
             
             .sidebar.collapsed .logo-text,
             .sidebar.collapsed .menu-text,
-            .sidebar.collapsed .submenu-text,
-            .sidebar.collapsed .subsubmenu-text {
+            .sidebar.collapsed .submenu-text {
                 opacity: 1;
                 width: auto;
-            }
-            
-            .sidebar.collapsed .submenu-item,
-            .sidebar.collapsed .subsubmenu-item {
-                padding-left: 50px;
-                justify-content: flex-start;
-            }
-            
-            .sidebar.collapsed .subsubmenu-item {
-                padding-left: 70px;
             }
             
             .sidebar.collapsed .menu-arrow {
                 display: block;
             }
             
-            .sidebar.collapsed .tooltip {
+            .sidebar .toggle-btn {
                 display: none;
             }
             
             .main-content {
                 margin-left: 0;
+                width: 100%;
             }
             
             .sidebar.collapsed ~ .main-content {
                 margin-left: 0;
             }
             
-            .menu-toggle {
-                display: block;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .card-container {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            }
-            
             .header {
-                padding: 0 15px;
+                padding: 0 16px;
             }
             
-            .search-box input {
-                width: 180px;
+            .content-container {
+                padding: 16px;
             }
             
-            .search-box input:focus {
-                width: 220px;
+            .card-container {
+                grid-template-columns: 1fr;
             }
-        }
-
-        /* 菜单切换按钮 */
-        .menu-toggle {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: var(--primary-color);
-            cursor: pointer;
-            padding: 5px;
+            
+            .header-right {
+                gap: 16px;
+            }
+            
+            .user-info {
+                display: none;
+            }
+            
+            .theme-text {
+                display: none;
+            }
+            
+            .theme-toggle-btn {
+                padding: 6px;
+                min-width: 36px;
+                justify-content: center;
+            }
         }
 
         /* 页脚 */
         .footer {
             text-align: center;
-            padding: 20px;
-            color: var(--gray-color);
+            padding: 16px;
+            color: var(--text-secondary);
             font-size: 14px;
-            border-top: 1px solid var(--light-gray);
-            margin-top: 30px;
+            border-top: 1px solid var(--border-color);
+            margin-top: 24px;
+            transition: color 0.3s, border-color 0.3s;
         }
     </style>
 </head>
@@ -653,8 +854,10 @@
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="logo">
-                <i class="fas fa-cogs"></i>
-                <span class="logo-text">TsgPro</span>
+                <div class="logo-icon">
+                    <i class="fas fa-panda"></i>
+                </div>
+                <span class="logo-text">Tsg</span>
             </div>
             <button class="toggle-btn" id="toggleBtn">
                 <i class="fas fa-chevron-left"></i>
@@ -662,157 +865,84 @@
         </div>
         
         <div class="sidebar-menu">
-            <a href="#" class="menu-item active" data-page="dashboard">
-                <i class="fas fa-home"></i>
-                <span class="menu-text">仪表板</span>
-                <span class="tooltip">仪表板</span>
-            </a>
-            
-            <div class="menu-item has-submenu" data-menu="user">
-                <i class="fas fa-users"></i>
-                <span class="menu-text">用户管理</span>
-                <span class="menu-arrow"><i class="fas fa-chevron-right"></i></span>
-                <span class="tooltip">用户管理</span>
-            </div>
-            <div class="submenu" id="user-submenu">
-                <a href="#" class="submenu-item" data-page="user-list">
-                    <i class="fas fa-list"></i>
-                    <span class="submenu-text">用户列表</span>
-                    <span class="tooltip">用户列表</span>
+            <div class="menu-group">
+                <div class="menu-group-title">主菜单</div>
+                <a href="#" class="menu-item active" data-page="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span class="menu-text">仪表板</span>
+                    <span class="tooltip">仪表板</span>
                 </a>
-                <a href="#" class="submenu-item" data-page="user-add">
-                    <i class="fas fa-user-plus"></i>
-                    <span class="submenu-text">添加用户</span>
-                    <span class="tooltip">添加用户</span>
+                
+                <a href="#" class="menu-item" data-page="members">
+                    <i class="fas fa-users"></i>
+                    <span class="menu-text">会员管理</span>
+                    <span class="tooltip">会员管理</span>
                 </a>
-                <a href="#" class="submenu-item" data-page="user-roles">
-                    <i class="fas fa-user-tag"></i>
-                    <span class="submenu-text">角色权限</span>
-                    <span class="tooltip">角色权限</span>
+                
+                <a href="#" class="menu-item" data-page="finance">
+                    <i class="fas fa-wallet"></i>
+                    <span class="menu-text">商户财务管理</span>
+                    <span class="tooltip">商户财务管理</span>
+                </a>
+                
+                <a href="#" class="menu-item" data-page="reports">
+                    <i class="fas fa-chart-bar"></i>
+                    <span class="menu-text">报表查询</span>
+                    <span class="tooltip">报表查询</span>
                 </a>
             </div>
             
-            <div class="menu-item has-submenu" data-menu="content">
-                <i class="fas fa-file-alt"></i>
-                <span class="menu-text">游戏管理</span>
-                <span class="menu-arrow"><i class="fas fa-chevron-right"></i></span>
-                <span class="tooltip">游戏管理</span>
-            </div>
-            <div class="submenu" id="content-submenu">
-                <a href="#" class="submenu-item" data-page="articles">
-                    <i class="fas fa-newspaper"></i>
-                    <span class="submenu-text">文章管理</span>
-                    <span class="tooltip">文章管理</span>
-                </a>
-                <a href="#" class="submenu-item" data-page="categories">
-                    <i class="fas fa-folder"></i>
-                    <span class="submenu-text">分类管理</span>
-                    <span class="tooltip">分类管理</span>
-                </a>
-                <div class="submenu-item has-subsubmenu" data-submenu="media">
-                    <i class="fas fa-photo-video"></i>
-                    <span class="submenu-text">媒体库</span>
+            <div class="menu-group">
+                <div class="menu-group-title">代理中心</div>
+                <div class="menu-item has-submenu" data-menu="agent">
+                    <i class="fas fa-sitemap"></i>
+                    <span class="menu-text">代理中心(无限极差)</span>
                     <span class="menu-arrow"><i class="fas fa-chevron-right"></i></span>
-                    <span class="tooltip">媒体库</span>
+                    <span class="tooltip">代理中心</span>
                 </div>
-                <div class="subsubmenu" id="media-subsubmenu">
-                    <a href="#" class="subsubmenu-item" data-page="images">
-                        <i class="fas fa-image"></i>
-                        <span class="subsubmenu-text">图片管理</span>
-                        <span class="tooltip">图片管理</span>
+                <div class="submenu" id="agent-submenu">
+                    <a href="#" class="submenu-item" data-page="agent-home">
+                        <i class="fas fa-home"></i>
+                        <span class="submenu-text">代理首页</span>
+                        <span class="tooltip">代理首页</span>
                     </a>
-                    <a href="#" class="subsubmenu-item" data-page="videos">
-                        <i class="fas fa-video"></i>
-                        <span class="subsubmenu-text">视频管理</span>
-                        <span class="tooltip">视频管理</span>
+                    <a href="#" class="submenu-item" data-page="direct-query">
+                        <i class="fas fa-user-friends"></i>
+                        <span class="submenu-text">直属查询</span>
+                        <span class="tooltip">直属查询</span>
                     </a>
-                    <a href="#" class="subsubmenu-item" data-page="documents">
-                        <i class="fas fa-file"></i>
-                        <span class="subsubmenu-text">文档管理</span>
-                        <span class="tooltip">文档管理</span>
-                </a>
+                    <a href="#" class="submenu-item" data-page="team-query">
+                        <i class="fas fa-users"></i>
+                        <span class="submenu-text">团队查询</span>
+                        <span class="tooltip">团队查询</span>
+                    </a>
+                    <a href="#" class="submenu-item" data-page="daily-data">
+                        <i class="fas fa-calendar-day"></i>
+                        <span class="submenu-text">每日数据</span>
+                        <span class="tooltip">每日数据</span>
+                    </a>
+                    <a href="#" class="submenu-item" data-page="commission-source">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span class="submenu-text">佣金来源</span>
+                        <span class="tooltip">佣金来源</span>
+                    </a>
                 </div>
             </div>
             
-            <div class="menu-item has-submenu" data-menu="ecommerce">
-                <i class="fas fa-shopping-cart"></i>
-                <span class="menu-text">商户管理</span>
-                <span class="menu-arrow"><i class="fas fa-chevron-right"></i></span>
-                <span class="tooltip">商户管理</span>
-            </div>
-            <div class="submenu" id="ecommerce-submenu">
-                <a href="#" class="submenu-item" data-page="products">
-                    <i class="fas fa-box"></i>
-                    <span class="submenu-text">商品管理</span>
-                    <span class="tooltip">商品管理</span>
+            <div class="menu-group">
+                <div class="menu-group-title">其他</div>
+                <a href="#" class="menu-item" data-page="welfare">
+                    <i class="fas fa-gift"></i>
+                    <span class="menu-text">福利中心</span>
+                    <span class="tooltip">福利中心</span>
                 </a>
-                <a href="#" class="submenu-item" data-page="orders">
-                    <i class="fas fa-receipt"></i>
-                    <span class="submenu-text">订单管理</span>
-                    <span class="tooltip">订单管理</span>
-                </a>
-                <a href="#" class="submenu-item" data-page="inventory">
-                    <i class="fas fa-warehouse"></i>
-                    <span class="submenu-text">库存管理</span>
-                    <span class="tooltip">库存管理</span>
+                
+                <a href="#" class="menu-item" data-page="operations">
+                    <i class="fas fa-cogs"></i>
+                    <span class="menu-text">运营相关</span>
+                    <span class="tooltip">运营相关</span>
                 </a>
             </div>
-
-             <div class="menu-item has-submenu" data-menu="ecommerce">
-                <i class="fas fa-shopping-cart"></i>
-                <span class="menu-text">活动管理</span>
-                <span class="menu-arrow"><i class="fas fa-chevron-right"></i></span>
-                <span class="tooltip">活动管理</span>
-            </div>
-            <div class="submenu" id="ecommerce-submenu">
-                <a href="#" class="submenu-item" data-page="products">
-                    <i class="fas fa-box"></i>
-                    <span class="submenu-text">投注记录</span>
-                    <span class="tooltip">投注记录</span>
-                </a>
-                <a href="#" class="submenu-item" data-page="orders">
-                    <i class="fas fa-receipt"></i>
-                    <span class="submenu-text">筛选投注数据</span>
-                    <span class="tooltip">筛选投注数据</span>
-                </a>
-                <a href="#" class="submenu-item" data-page="inventory">
-                    <i class="fas fa-warehouse"></i>
-                    <span class="submenu-text">会员输赢</span>
-                    <span class="tooltip">会员输赢</span>
-                </a>
-            </div>
-            
-            <div class="menu-divider"></div>
-            
-            <div class="menu-item has-submenu" data-menu="system">
-                <i class="fas fa-cog"></i>
-                <span class="menu-text">稽核管理</span>
-                <span class="menu-arrow"><i class="fas fa-chevron-right"></i></span>
-                <span class="tooltip">稽核管理</span>
-            </div>
-            <div class="submenu" id="system-submenu">
-                <a href="#" class="submenu-item" data-page="general">
-                    <i class="fas fa-sliders-h"></i>
-                    <span class="submenu-text">常规设置</span>
-                    <span class="tooltip">常规设置</span>
-                </a>
-                <a href="#" class="submenu-item" data-page="security">
-                    <i class="fas fa-shield-alt"></i>
-                    <span class="submenu-text">安全设置</span>
-                    <span class="tooltip">安全设置</span>
-                </a>
-                <a href="#" class="submenu-item" data-page="backup">
-                    <i class="fas fa-database"></i>
-                    <span class="submenu-text">备份恢复</span>
-                    <span class="tooltip">备份恢复</span>
-                </a>
-            </div>
-            
-            <a href="#" class="menu-item" data-page="help">
-                <i class="fas fa-question-circle"></i>
-                <span class="menu-text">帮助与支持</span>
-                <span class="tooltip">帮助与支持</span>
-            </a>
         </div>
     </aside>
     
@@ -821,117 +951,207 @@
         <!-- 顶部栏 -->
         <header class="header">
             <div class="header-left">
-                <button class="menu-toggle" id="menuToggle">
+                <button class="btn" id="menuToggle" style="display: none;">
                     <i class="fas fa-bars"></i>
                 </button>
-                <h1 id="pageTitle">仪表板概览</h1>
+                <h1 class="page-title" id="pageTitle">仪表板</h1>
             </div>
             
             <div class="header-right">
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="搜索...">
+                <!-- 主题切换按钮 -->
+                <div class="theme-toggle">
+                    <button class="btn theme-toggle-btn" id="themeToggle">
+                        <i class="fas fa-moon"></i>
+                        <span class="theme-text">深色模式</span>
+                    </button>
                 </div>
                 
-                <div class="notification">
-                    <i class="fas fa-bell"></i>
-                    <div class="notification-badge">3</div>
+                <div class="locale-info">
+                    <div class="locale-flag"></div>
+                    <div class="time-date">
+                        <span class="timezone">GMT+3</span>
+                        <span class="date" id="currentDate"></span>
+                    </div>
                 </div>
                 
-                <div class="user-profile">
-                    <div class="user-avatar">张</div>
-                    <div class="user-info">
-                        <div class="user-name">张三</div>
-                        <div class="user-role">超级管理员</div>
+                <div class="user-actions">
+                    <div class="notification">
+                        <i class="fas fa-bell"></i>
+                        <div class="notification-badge">3</div>
+                    </div>
+                    
+                    <div class="user-profile">
+                        <div class="user-avatar">A</div>
+                        <div class="user-info">
+                            <div class="user-name">管理员</div>
+                            <div class="user-role">超级管理员</div>
+                        </div>
+                        <i class="fas fa-chevron-down" style="font-size: 12px;"></i>
                     </div>
                 </div>
             </div>
         </header>
         
-        <!-- 动态内容区域 -->
-        <div id="contentArea">
-            <!-- 默认显示仪表板 -->
-            <div class="content-section">
-                <h2 class="section-title"><i class="fas fa-home"></i> 欢迎来到管理面板</h2>
-                <p>这是一个带有可折叠侧边菜单的管理面板。点击侧边栏的菜单项可以展开/收缩子菜单。</p>
-                <p>侧边栏可以完全折叠，折叠后只显示图标，鼠标悬停会显示工具提示。</p>
+        <!-- 内容区域 -->
+        <div class="content-container">
+            <div class="content-header">
+                <h2 class="content-title" id="contentTitle">系统概览</h2>
+                <div class="content-actions">
+                    <button class="btn">
+                        <i class="fas fa-download"></i>
+                        导出数据
+                    </button>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        新建
+                    </button>
+                </div>
             </div>
             
+            <!-- 卡片区域 -->
             <div class="card-container">
                 <div class="card">
                     <div class="card-header">
-                        <div class="card-title">用户总数</div>
-                        <div class="card-icon users">
+                        <div class="card-title">会员总数</div>
+                        <div class="card-icon members">
                             <i class="fas fa-users"></i>
                         </div>
                     </div>
-                    <div class="card-value">12,548</div>
+                    <div class="card-value">12,845</div>
                     <div class="card-change positive">
                         <i class="fas fa-arrow-up"></i>
-                        <span>12% 较上月</span>
+                        <span>8.5% 较昨日</span>
                     </div>
                 </div>
                 
                 <div class="card">
                     <div class="card-header">
-                        <div class="card-title">总收入</div>
-                        <div class="card-icon revenue">
-                            <i class="fas fa-dollar-sign"></i>
+                        <div class="card-title">财务总额</div>
+                        <div class="card-icon finance">
+                            <i class="fas fa-wallet"></i>
                         </div>
                     </div>
-                    <div class="card-value">¥ 245,880</div>
+                    <div class="card-value">¥ 3,245,880</div>
                     <div class="card-change positive">
                         <i class="fas fa-arrow-up"></i>
-                        <span>8% 较上月</span>
+                        <span>12.3% 较昨日</span>
                     </div>
                 </div>
                 
                 <div class="card">
                     <div class="card-header">
-                        <div class="card-title">订单总数</div>
-                        <div class="card-icon orders">
+                        <div class="card-title">代理总数</div>
+                        <div class="card-icon agents">
+                            <i class="fas fa-sitemap"></i>
+                        </div>
+                    </div>
+                    <div class="card-value">1,248</div>
+                    <div class="card-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>5.2% 较昨日</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">今日订单</div>
+                        <div class="card-icon reports">
                             <i class="fas fa-shopping-cart"></i>
                         </div>
                     </div>
                     <div class="card-value">3,284</div>
                     <div class="card-change negative">
                         <i class="fas fa-arrow-down"></i>
-                        <span>3% 较上月</span>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">网站访客</div>
-                        <div class="card-icon visitors">
-                            <i class="fas fa-eye"></i>
-                        </div>
-                    </div>
-                    <div class="card-value">58,942</div>
-                    <div class="card-change positive">
-                        <i class="fas fa-arrow-up"></i>
-                        <span>21% 较上月</span>
+                        <span>2.1% 较昨日</span>
                     </div>
                 </div>
             </div>
             
-            <div class="content-section">
-                <h2 class="section-title"><i class="fas fa-info-circle"></i> 功能说明</h2>
-                <p>这个管理面板包含以下特性：</p>
-                <ul style="padding-left: 20px; margin-top: 10px;">
-                    <li>可折叠的侧边栏（点击右上角的折叠按钮）</li>
-                    <li>多级可展开/收缩的菜单（用户管理、内容管理、电商管理、系统设置）</li>
-                    <li>侧边栏折叠时，鼠标悬停显示工具提示</li>
-                    <li>响应式设计，适配移动设备</li>
-                    <li>动态内容切换（点击菜单项会切换右侧内容）</li>
-                </ul>
+            <!-- 表格区域 -->
+            <div class="table-container">
+                <h3 class="table-title">最近活动</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>用户名</th>
+                            <th>类型</th>
+                            <th>时间</th>
+                            <th>金额</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#001245</td>
+                            <td>user_zhang</td>
+                            <td>充值</td>
+                            <td>2026-02-02 10:25</td>
+                            <td>¥ 1,000</td>
+                            <td><span class="status active">成功</span></td>
+                            <td class="action-buttons">
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">编辑</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#001244</td>
+                            <td>user_wang</td>
+                            <td>提现</td>
+                            <td>2026-02-02 09:18</td>
+                            <td>¥ 500</td>
+                            <td><span class="status pending">处理中</span></td>
+                            <td class="action-buttons">
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">编辑</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#001243</td>
+                            <td>user_li</td>
+                            <td>转账</td>
+                            <td>2026-02-02 08:42</td>
+                            <td>¥ 2,000</td>
+                            <td><span class="status active">成功</span></td>
+                            <td class="action-buttons">
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">编辑</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#001242</td>
+                            <td>user_zhao</td>
+                            <td>充值</td>
+                            <td>2026-02-02 07:15</td>
+                            <td>¥ 3,000</td>
+                            <td><span class="status active">成功</span></td>
+                            <td class="action-buttons">
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">编辑</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#001241</td>
+                            <td>user_qian</td>
+                            <td>提现</td>
+                            <td>2026-02-01 22:30</td>
+                            <td>¥ 1,500</td>
+                            <td><span class="status inactive">已取消</span></td>
+                            <td class="action-buttons">
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">编辑</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
+            
+            <!-- 页脚 -->
+            <footer class="footer">
+                <p>© 2026 Panda 管理系统 | 版本 3.0.0 | 仅供内部使用</p>
+            </footer>
         </div>
-        
-        <!-- 页脚 -->
-        <footer class="footer">
-            <p>© 2023 AdminPro 管理系统 | 版本 2.2.0 | 最后更新: 2023年10月16日</p>
-        </footer>
     </main>
 
     <script>
@@ -940,7 +1160,74 @@
         const toggleBtn = document.getElementById('toggleBtn');
         const menuToggle = document.getElementById('menuToggle');
         const pageTitle = document.getElementById('pageTitle');
-        const contentArea = document.getElementById('contentArea');
+        const contentTitle = document.getElementById('contentTitle');
+        const currentDate = document.getElementById('currentDate');
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+        const themeText = themeToggle.querySelector('.theme-text');
+        
+        // 主题切换功能
+        function initTheme() {
+            const savedTheme = localStorage.getItem('panda-theme') || 'light';
+            setTheme(savedTheme);
+        }
+        
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            
+            if (theme === 'dark') {
+                themeIcon.className = 'fas fa-sun';
+                themeText.textContent = '浅色模式';
+                localStorage.setItem('panda-theme', 'dark');
+            } else {
+                themeIcon.className = 'fas fa-moon';
+                themeText.textContent = '深色模式';
+                localStorage.setItem('panda-theme', 'light');
+            }
+        }
+        
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            setTheme(newTheme);
+        }
+        
+        // 添加主题切换事件监听
+        themeToggle.addEventListener('click', toggleTheme);
+        
+        // 设置当前日期
+        function setBeijingTime() {
+            const now = new Date();
+            
+            // 使用北京时区
+            const options = {
+                timeZone: 'Asia/Shanghai',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            };
+            
+            // 格式化为字符串
+            const timeStr = now.toLocaleString('zh-CN', options);
+            
+            // 确保格式统一（如2026/02/02而不是2026/2/2）
+            const [datePart, timePart] = timeStr.split(' ');
+            const [year, month, day] = datePart.split('/');
+            
+            // 补零（month和day可能已经是2位，但保险起见）
+            const paddedMonth = month.padStart(2, '0');
+            const paddedDay = day.padStart(2, '0');
+            
+            currentDate.textContent = `${year}/${paddedMonth}/${paddedDay} ${timePart}`;
+        }
+        
+        // 立即执行并每秒更新
+        setBeijingTime();
+        setInterval(setBeijingTime, 1000);
         
         // 侧边栏折叠/展开
         toggleBtn.addEventListener('click', function() {
@@ -948,55 +1235,59 @@
         });
         
         // 移动端菜单切换
-        menuToggle.addEventListener('click', function() {
-            sidebar.classList.toggle('active');
-        });
+        if (menuToggle) {
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('active');
+            });
+        }
         
-        // 所有菜单项
-        const menuItems = document.querySelectorAll('.menu-item');
-        const submenuItems = document.querySelectorAll('.submenu-item');
-        const subsubmenuItems = document.querySelectorAll('.subsubmenu-item');
+        // 检测是否为移动设备
+        const isMobile = () => window.innerWidth <= 992;
+        
+        // 根据屏幕大小显示/隐藏菜单切换按钮
+        function checkScreenSize() {
+            if (isMobile()) {
+                menuToggle.style.display = 'flex';
+                toggleBtn.style.display = 'none';
+            } else {
+                menuToggle.style.display = 'none';
+                toggleBtn.style.display = 'block';
+                sidebar.classList.remove('active');
+            }
+        }
+        
+        // 初始检查和窗口大小变化监听
+        checkScreenSize();
+        window.addEventListener('resize', checkScreenSize);
         
         // 子菜单切换
         const menuItemsWithSubmenu = document.querySelectorAll('.menu-item.has-submenu');
-        const submenuItemsWithSubsubmenu = document.querySelectorAll('.submenu-item.has-subsubmenu');
         
         menuItemsWithSubmenu.forEach(item => {
             item.addEventListener('click', function(e) {
                 e.preventDefault();
                 
+                const menuId = this.getAttribute('data-menu');
+                const submenu = document.getElementById(`${menuId}-submenu`);
+                
                 // 如果侧边栏已折叠，则展开并打开子菜单
-                if (sidebar.classList.contains('collapsed') && window.innerWidth > 992) {
+                if (sidebar.classList.contains('collapsed') && !isMobile()) {
                     sidebar.classList.remove('collapsed');
-                    // 稍等侧边栏展开动画完成
                     setTimeout(() => {
-                        toggleSubmenu(this);
+                        toggleSubmenu(this, submenu);
                     }, 300);
                 } else {
-                    toggleSubmenu(this);
+                    toggleSubmenu(this, submenu);
                 }
             });
         });
         
-        submenuItemsWithSubsubmenu.forEach(item => {
-            item.addEventListener('click', function(e) {
-                e.preventDefault();
-                toggleSubsubmenu(this);
-            });
-        });
-        
         // 切换子菜单显示/隐藏
-        function toggleSubmenu(menuItem) {
-            const menuId = menuItem.getAttribute('data-menu');
-            const submenu = document.getElementById(`${menuId}-submenu`);
-            
+        function toggleSubmenu(menuItem, submenu) {
             // 关闭其他所有子菜单
             document.querySelectorAll('.submenu').forEach(sm => {
                 if (sm !== submenu) {
                     sm.classList.remove('open');
-                    // 关闭对应的二级子菜单
-                    const subsubmenus = sm.querySelectorAll('.subsubmenu');
-                    subsubmenus.forEach(ssm => ssm.classList.remove('open'));
                 }
             });
             
@@ -1007,25 +1298,10 @@
             const arrow = menuItem.querySelector('.menu-arrow i');
             if (submenu.classList.contains('open')) {
                 arrow.style.transform = 'rotate(90deg)';
+                menuItem.classList.add('active');
             } else {
                 arrow.style.transform = 'rotate(0deg)';
-            }
-        }
-        
-        // 切换二级子菜单显示/隐藏
-        function toggleSubsubmenu(submenuItem) {
-            const submenuId = submenuItem.getAttribute('data-submenu');
-            const subsubmenu = document.getElementById(`${submenuId}-subsubmenu`);
-            
-            // 切换二级子菜单
-            subsubmenu.classList.toggle('open');
-            
-            // 更新父菜单箭头
-            const arrow = submenuItem.querySelector('.menu-arrow i');
-            if (subsubmenu.classList.contains('open')) {
-                arrow.style.transform = 'rotate(90deg)';
-            } else {
-                arrow.style.transform = 'rotate(0deg)';
+                menuItem.classList.remove('active');
             }
         }
         
@@ -1033,9 +1309,10 @@
         function changePage(pageName, pageTitleText) {
             // 更新页面标题
             pageTitle.textContent = pageTitleText;
+            contentTitle.textContent = pageTitleText;
             
             // 更新活动菜单项
-            document.querySelectorAll('.menu-item, .submenu-item, .subsubmenu-item').forEach(item => {
+            document.querySelectorAll('.menu-item, .submenu-item').forEach(item => {
                 item.classList.remove('active');
             });
             
@@ -1055,235 +1332,96 @@
                         // 更新箭头
                         const arrow = parentMenu.querySelector('.menu-arrow i');
                         arrow.style.transform = 'rotate(90deg)';
-                    }
-                }
-                
-                // 如果是二级子菜单项，确保父菜单和祖父菜单是展开的
-                if (activeItem.classList.contains('subsubmenu-item')) {
-                    const parentSubmenu = activeItem.closest('.subsubmenu');
-                    const parentMenuItem = parentSubmenu.previousElementSibling;
-                    
-                    if (parentMenuItem && parentMenuItem.classList.contains('has-subsubmenu')) {
-                        const submenuId = parentMenuItem.getAttribute('data-submenu');
-                        const subsubmenu = document.getElementById(`${submenuId}-subsubmenu`);
-                        subsubmenu.classList.add('open');
-                        
-                        // 更新箭头
-                        const arrow = parentMenuItem.querySelector('.menu-arrow i');
-                        arrow.style.transform = 'rotate(90deg)';
-                        
-                        // 确保祖父菜单也展开
-                        const grandParentMenu = parentMenuItem.closest('.submenu').previousElementSibling;
-                        if (grandParentMenu && grandParentMenu.classList.contains('has-submenu')) {
-                            const menuId = grandParentMenu.getAttribute('data-menu');
-                            const submenu = document.getElementById(`${menuId}-submenu`);
-                            submenu.classList.add('open');
-                            
-                            // 更新箭头
-                            const grandArrow = grandParentMenu.querySelector('.menu-arrow i');
-                            grandArrow.style.transform = 'rotate(90deg)';
-                        }
+                        parentMenu.classList.add('active');
                     }
                 }
             }
-            
-            // 模拟加载页面内容
-            const pageTitles = {
-                'dashboard': '仪表板概览',
-                'user-list': '用户列表',
-                'user-add': '添加用户',
-                'user-roles': '角色权限',
-                'articles': '文章管理',
-                'categories': '分类管理',
-                'images': '图片管理',
-                'videos': '视频管理',
-                'documents': '文档管理',
-                'products': '商品管理',
-                'orders': '订单管理',
-                'inventory': '库存管理',
-                'general': '常规设置',
-                'security': '安全设置',
-                'backup': '备份恢复',
-                'help': '帮助与支持'
-            };
-            
-            const pageDescriptions = {
-                'dashboard': '这是系统的主仪表板，显示关键指标和统计数据。',
-                'user-list': '管理所有系统用户，可以查看、编辑或删除用户账户。',
-                'user-add': '添加新用户到系统中，设置用户角色和权限。',
-                'user-roles': '管理系统角色和权限配置，控制用户访问级别。',
-                'articles': '管理网站文章，包括创建、编辑、发布和删除操作。',
-                'categories': '管理内容分类，组织文章和其他内容。',
-                'images': '管理网站图片资源，支持上传、裁剪和优化。',
-                'videos': '管理视频内容，包括上传、转码和发布。',
-                'documents': '管理系统文档，支持PDF、Word、Excel等格式。',
-                'products': '管理电商商品，包括商品信息、价格和库存。',
-                'orders': '查看和处理客户订单，跟踪订单状态。',
-                'inventory': '管理系统库存，包括库存调整和预警设置。',
-                'general': '配置系统常规设置，如站点名称、Logo等。',
-                'security': '配置系统安全设置，包括密码策略和登录限制。',
-                'backup': '管理系统数据备份和恢复功能。',
-                'help': '查看系统帮助文档和技术支持信息。'
-            };
-            
-            const content = `
-                <div class="content-section">
-                    <h2 class="section-title"><i class="fas fa-${getPageIcon(pageName)}"></i> ${pageTitles[pageName] || pageTitleText}</h2>
-                    <p>${pageDescriptions[pageName] || '这是该功能页面的描述信息。'}</p>
-                    <p>页面功能正在开发中，这里显示的是模拟内容。</p>
-                </div>
-                
-                <div class="card-container">
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-title">会员访问量</div>
-                            <div class="card-icon visitors">
-                                <i class="fas fa-chart-line"></i>
-                            </div>
-                        </div>
-                        <div class="card-value">1,248</div>
-                        <div class="card-change positive">
-                            <i class="fas fa-arrow-up"></i>
-                            <span>5% 较上周</span>
-                        </div>
-                    </div>
-                    
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-title">操作记录</div>
-                            <div class="card-icon orders">
-                                <i class="fas fa-history"></i>
-                            </div>
-                        </div>
-                        <div class="card-value">342</div>
-                        <div class="card-change positive">
-                            <i class="fas fa-arrow-up"></i>
-                            <span>18% 较上周</span>
-                        </div>
-                    </div>
-                    
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-title">今日新增</div>
-                            <div class="card-icon users">
-                                <i class="fas fa-plus-circle"></i>
-                            </div>
-                        </div>
-                        <div class="card-value">24</div>
-                        <div class="card-change negative">
-                            <i class="fas fa-arrow-down"></i>
-                            <span>2% 较昨日</span>
-                        </div>
-                    </div>
-                    
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-title">处理效率</div>
-                            <div class="card-icon revenue">
-                                <i class="fas fa-bolt"></i>
-                            </div>
-                        </div>
-                        <div class="card-value">94%</div>
-                        <div class="card-change positive">
-                            <i class="fas fa-arrow-up"></i>
-                            <span>3% 较上周</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="content-section">
-                    <h2 class="section-title"><i class="fas fa-table"></i> 数据列表</h2>
-                    <p>以下是该模块的示例数据列表：</p>
-                    <div style="overflow-x: auto; margin-top: 20px;">
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <thead>
-                                <tr style="background-color: #f8f9fa;">
-                                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e9ecef;">ID</th>
-                                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e9ecef;">名称</th>
-                                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e9ecef;">状态</th>
-                                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e9ecef;">创建时间</th>
-                                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e9ecef;">操作</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${generateTableRows(pageName)}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            `;
-            
-            contentArea.innerHTML = content;
             
             // 在移动设备上点击后关闭侧边栏
-            if (window.innerWidth <= 992) {
+            if (isMobile()) {
                 sidebar.classList.remove('active');
             }
+            
+            // 更新卡片数据
+            updateCardData(pageName);
         }
         
-        // 获取页面图标
-        function getPageIcon(pageName) {
-            const icons = {
-                'dashboard': 'home',
-                'user-list': 'list',
-                'user-add': 'user-plus',
-                'user-roles': 'user-tag',
-                'articles': 'newspaper',
-                'categories': 'folder',
-                'images': 'image',
-                'videos': 'video',
-                'documents': 'file',
-                'products': 'box',
-                'orders': 'receipt',
-                'inventory': 'warehouse',
-                'general': 'sliders-h',
-                'security': 'shield-alt',
-                'backup': 'database',
-                'help': 'question-circle'
+        // 更新卡片数据
+        function updateCardData(pageName) {
+            const cardData = {
+                'dashboard': {
+                    titles: ['会员总数', '财务总额', '代理总数', '今日订单'],
+                    values: ['12,845', '¥ 3,245,880', '1,248', '3,284'],
+                    changes: ['8.5%', '12.3%', '5.2%', '-2.1%'],
+                    changeTypes: ['positive', 'positive', 'positive', 'negative']
+                },
+                'members': {
+                    titles: ['会员总数', '新增会员', '活跃会员', '会员留存率'],
+                    values: ['12,845', '245', '8,942', '89.2%'],
+                    changes: ['8.5%', '15.2%', '3.8%', '2.1%'],
+                    changeTypes: ['positive', 'positive', 'positive', 'positive']
+                },
+                'finance': {
+                    titles: ['财务总额', '今日收入', '今日支出', '净利润'],
+                    values: ['¥ 3,245,880', '¥ 245,880', '¥ 128,450', '¥ 117,430'],
+                    changes: ['12.3%', '8.5%', '5.2%', '12.8%'],
+                    changeTypes: ['positive', 'positive', 'negative', 'positive']
+                },
+                'reports': {
+                    titles: ['报表总数', '今日生成', '待处理', '已完成'],
+                    values: ['1,248', '45', '12', '1,191'],
+                    changes: ['5.2%', '8.5%', '-3.2%', '5.8%'],
+                    changeTypes: ['positive', 'positive', 'negative', 'positive']
+                },
+                'agent-home': {
+                    titles: ['代理总数', '新增代理', '团队人数', '总佣金'],
+                    values: ['1,248', '24', '12,845', '¥ 845,230'],
+                    changes: ['5.2%', '8.5%', '8.5%', '12.3%'],
+                    changeTypes: ['positive', 'positive', 'positive', 'positive']
+                },
+                'direct-query': {
+                    titles: ['直属代理', '新增直属', '活跃直属', '直属贡献'],
+                    values: ['248', '12', '198', '¥ 245,880'],
+                    changes: ['3.2%', '8.5%', '2.1%', '8.5%'],
+                    changeTypes: ['positive', 'positive', 'positive', 'positive']
+                },
+                'welfare': {
+                    titles: ['福利总数', '今日发放', '待发放', '总价值'],
+                    values: ['124', '45', '12', '¥ 845,230'],
+                    changes: ['5.2%', '8.5%', '-3.2%', '12.3%'],
+                    changeTypes: ['positive', 'positive', 'negative', 'positive']
+                },
+                'operations': {
+                    titles: ['运营项目', '进行中', '已完成', '成功率'],
+                    values: ['24', '12', '8', '94.2%'],
+                    changes: ['3.2%', '5.2%', '8.5%', '2.1%'],
+                    changeTypes: ['positive', 'positive', 'positive', 'positive']
+                }
             };
             
-            return icons[pageName] || 'info-circle';
-        }
-        
-        // 生成表格行
-        function generateTableRows(pageName) {
-            let rows = '';
-            const itemNames = {
-                'user-list': ['张三', '李四', '王五', '赵六', '钱七'],
-                'articles': ['如何学习React', 'Vue 3新特性', 'CSS Grid布局指南', 'JavaScript高级技巧', 'Node.js实战'],
-                'products': ['笔记本电脑', '智能手机', '无线耳机', '智能手表', '平板电脑'],
-                'orders': ['#ORD-001', '#ORD-002', '#ORD-003', '#ORD-004', '#ORD-005']
-            };
+            const data = cardData[pageName] || cardData['dashboard'];
+            const cards = document.querySelectorAll('.card');
             
-            const defaultNames = ['项目一', '项目二', '项目三', '项目四', '项目五'];
-            const names = itemNames[pageName] || defaultNames;
-            
-            for (let i = 1; i <= 5; i++) {
-                const statuses = ['active', 'pending', 'inactive'];
-                const status = statuses[Math.floor(Math.random() * statuses.length)];
-                const statusText = status === 'active' ? '活跃' : status === 'pending' ? '待处理' : '未激活';
-                
-                rows += `
-                    <tr>
-                        <td style="padding: 12px; border-bottom: 1px solid #e9ecef;">#${1000 + i}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid #e9ecef;">${names[i-1]}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid #e9ecef;">
-                            <span style="padding: 4px 8px; border-radius: 20px; font-size: 12px; font-weight: 600; 
-                                background-color: ${status === 'active' ? 'rgba(76, 175, 80, 0.1)' : status === 'pending' ? 'rgba(255, 152, 0, 0.1)' : 'rgba(108, 117, 125, 0.1)'}; 
-                                color: ${status === 'active' ? '#4CAF50' : status === 'pending' ? '#ff9800' : '#6c757d'}">
-                                ${statusText}
-                            </span>
-                        </td>
-                        <td style="padding: 12px; border-bottom: 1px solid #e9ecef;">2023-10-${10 + i}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid #e9ecef;">
-                            <button style="padding: 4px 8px; background-color: #4361ee; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; margin-right: 5px;">查看</button>
-                            <button style="padding: 4px 8px; background-color: #6c757d; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;">编辑</button>
-                        </td>
-                    </tr>
-                `;
-            }
-            
-            return rows;
+            cards.forEach((card, index) => {
+                if (index < data.titles.length) {
+                    card.querySelector('.card-title').textContent = data.titles[index];
+                    card.querySelector('.card-value').textContent = data.values[index];
+                    
+                    const changeElement = card.querySelector('.card-change');
+                    changeElement.className = `card-change ${data.changeTypes[index]}`;
+                    
+                    const arrowIcon = changeElement.querySelector('i');
+                    const changeText = changeElement.querySelector('span');
+                    
+                    if (data.changeTypes[index] === 'positive') {
+                        arrowIcon.className = 'fas fa-arrow-up';
+                        changeText.textContent = `${data.changes[index]} 较昨日`;
+                    } else {
+                        arrowIcon.className = 'fas fa-arrow-down';
+                        changeText.textContent = `${data.changes[index].replace('-', '')} 较昨日`;
+                    }
+                }
+            });
         }
         
         // 为所有可点击的菜单项添加事件
@@ -1291,41 +1429,77 @@
             item.addEventListener('click', function(e) {
                 e.preventDefault();
                 const pageName = this.getAttribute('data-page');
-                const pageTitleText = this.querySelector('.menu-text, .submenu-text, .subsubmenu-text').textContent;
+                const textElement = this.querySelector('.menu-text, .submenu-text');
+                const pageTitleText = textElement ? textElement.textContent : this.textContent;
                 changePage(pageName, pageTitleText);
             });
         });
+        
+        // 点击通知图标
+        const notification = document.querySelector('.notification');
+        notification.addEventListener('click', function() {
+            alert('您有3条未读通知！\n1. 新会员注册成功\n2. 财务审核待处理\n3. 系统维护通知');
+            this.querySelector('.notification-badge').style.display = 'none';
+        });
+        
+        // 用户资料点击
+        const userProfile = document.querySelector('.user-profile');
+        userProfile.addEventListener('click', function() {
+            alert('用户资料\n用户名：管理员\n角色：超级管理员\n最后登录：2026-02-02 08:30');
+        });
+        
+        // 自动更新日期和时间
+        function updateDateTime() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            currentDate.textContent = `${year}/${month}/${day}`;
+        }
+        
+        // 每分钟更新一次时间
+        setInterval(updateDateTime, 60000);
         
         // 模拟数据更新
         function updateData() {
             const cards = document.querySelectorAll('.card-value');
             if (cards.length > 0) {
                 cards.forEach(card => {
-                    const currentValue = parseInt(card.textContent.replace(/[^0-9]/g, ''));
-                    const randomChange = Math.floor(Math.random() * 20) - 5;
-                    const newValue = Math.max(1, Math.floor(currentValue * (1 + randomChange/100)));
+                    const currentValue = card.textContent;
+                    const isCurrency = currentValue.includes('¥');
+                    const isPercentage = currentValue.includes('%');
                     
-                    if (card.parentElement.querySelector('.card-title').textContent.includes('收入')) {
-                        card.textContent = '¥ ' + newValue.toLocaleString();
-                    } else if (card.textContent.includes('%')) {
-                        card.textContent = newValue + '%';
-                    } else {
-                        card.textContent = newValue.toLocaleString();
-                    }
+                    let numericValue = parseFloat(currentValue.replace(/[^0-9.]/g, ''));
                     
-                    const changeElement = card.nextElementSibling;
-                    if (changeElement && changeElement.classList.contains('card-change')) {
-                        const arrowIcon = changeElement.querySelector('i');
-                        const changeText = changeElement.querySelector('span');
+                    if (!isNaN(numericValue)) {
+                        const randomChange = (Math.random() * 10) - 2; // -2% 到 +8%
+                        numericValue = Math.max(1, numericValue * (1 + randomChange/100));
                         
-                        if (randomChange >= 0) {
-                            changeElement.className = 'card-change positive';
-                            arrowIcon.className = 'fas fa-arrow-up';
-                            changeText.textContent = `${randomChange}% 较上周`;
+                        if (isCurrency) {
+                            card.textContent = '¥ ' + numericValue.toLocaleString('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0
+                            });
+                        } else if (isPercentage) {
+                            card.textContent = numericValue.toFixed(1) + '%';
                         } else {
-                            changeElement.className = 'card-change negative';
-                            arrowIcon.className = 'fas fa-arrow-down';
-                            changeText.textContent = `${Math.abs(randomChange)}% 较上周`;
+                            card.textContent = Math.round(numericValue).toLocaleString();
+                        }
+                        
+                        const changeElement = card.nextElementSibling;
+                        if (changeElement && changeElement.classList.contains('card-change')) {
+                            const arrowIcon = changeElement.querySelector('i');
+                            const changeText = changeElement.querySelector('span');
+                            
+                            if (randomChange >= 0) {
+                                changeElement.className = 'card-change positive';
+                                arrowIcon.className = 'fas fa-arrow-up';
+                                changeText.textContent = `${randomChange.toFixed(1)}% 较昨日`;
+                            } else {
+                                changeElement.className = 'card-change negative';
+                                arrowIcon.className = 'fas fa-arrow-down';
+                                changeText.textContent = `${Math.abs(randomChange).toFixed(1)}% 较昨日`;
+                            }
                         }
                     }
                 });
@@ -1335,29 +1509,8 @@
         // 每30秒更新一次数据
         setInterval(updateData, 30000);
         
-        // 点击通知图标
-        const notification = document.querySelector('.notification');
-        notification.addEventListener('click', function() {
-            alert('您有3条未读通知！\n1. 新用户注册\n2. 系统维护通知\n3. 数据备份完成');
-            this.querySelector('.notification-badge').style.display = 'none';
-        });
-        
-        // 搜索框聚焦效果
-        const searchInput = document.querySelector('.search-box input');
-        searchInput.addEventListener('focus', function() {
-            this.parentElement.style.transform = 'scale(1.05)';
-        });
-        
-        searchInput.addEventListener('blur', function() {
-            this.parentElement.style.transform = 'scale(1)';
-        });
-        
-        // 窗口大小变化时调整侧边栏
-        window.addEventListener('resize', function() {
-            if (window.innerWidth > 992) {
-                sidebar.classList.remove('active');
-            }
-        });
+        // 页面加载时初始化主题
+        window.addEventListener('DOMContentLoaded', initTheme);
     </script>
 </body>
 </html>
